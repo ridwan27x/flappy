@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="world" width="500" height="500" style="border: 1px solid black;"></canvas>
+    <script>
+        // Inisialisasi canvas
+        let canvas = document.getElementById('world');
+        let context = canvas.getContext('2d');
+
+
+        // Import asset
+        let bird = new Image();
+        bird.src = "bird2.jpg";
+        let sound = new Audio();
+        sound.src = "tuing.mp3";
+
+        // Burung
+        let g = 0; // Gravitasi
+        let xBird = 0; // Awal x burung
+        let yBird = canvas.height / 2 - 100; // Awal y burung
+        let wBird = 40; // Ukuran lebar gambar burung
+        let hBird = 40; // Ukuran tinggi gambar burung
+        
+        // Pipa
+        let lPipa = 50;
+        let batasAman = 150;
+        let taPipa = 100;
+        let tbPipa = canvas.height - batasAman - taPipa;
+        let xPipa = canvas.width - lPipa;
+        let yaPipa = 0;
+        let ybPipa = taPipa + batasAman;
+        
+        // Movement
+        let pipaSpeed = 5;
+        let pipaPassed = false;
+        let score = 0;
+
+
+        // Menambahkan event listener spasi utk loncat
+        window.addEventListener("keypress", function() {
+            if(event.keyCode == 32) {
+                g = g - 10;
+                sound.pause();
+                sound.currentTime = 0;
+                sound.play();
+            }
+        })
+
+        function drawScore() {
+            context.font = "20px Arial";
+            context.fillStyle = "black";
+            context.fillText("Score: " + score, 10, 30);
+        }
+        
+        // Membuat fps
+        window.setInterval(function() {
+            context.clearRect(0,0,canvas.width,canvas.height);
+            g = g + 1;
+            context.drawImage(bird, xBird, yBird, wBird, hBird);
+            yBird = yBird + g;
+
+        if(yBird >= canvas.height) { // kalo bird jatoh
+            gameOver();
+        }
+
+        if(yBird < 0) {
+            yBird = 0;
+            g = 0;
+        }
+
+        xPipa = xPipa - pipaSpeed;
+
+        // Menggambar pipa
+        context.fillStyle = "light blue";
+        context.strokeStyle = "black";
+        // Pipa Atas
+        context.fillRect(xPipa, 0, lPipa, 100);
+        context.strokeRect(xPipa, 0, lPipa, 100);
+        // Pipa Bawah 
+        context.fillRect(xPipa, ybPipa ,lPipa, tbPipa);
+        context.strokeRect(xPipa, ybPipa ,lPipa, tbPipa);
+
+        if(xBird + wBird >= xPipa && xBird <= xPipa + lPipa && (yBird + 10 <= taPipa || yBird + (hBird - 20) >= ybPipa)) {
+            gameOver(); // Kalah
+        } else if(xBird > xPipa + 50 && !pipaPassed) {
+            pipaPassed = true;
+            score++;
+        }
+        drawScore();
+
+ 
+
+        }, 1000 / 30)
+
+        function gameOver() {
+            alert('Game Over');
+
+            g = 0; 
+            xBird = 0; 
+            yBird = canvas.height / 2 - 100; 
+            wBird = 40; 
+            hBird = 40;
+            xPipa = canvas.width - lPipa
+            score = 0; 
+            pipaPassed = false;
+        }
+    </script>
+</body>
+</html>
